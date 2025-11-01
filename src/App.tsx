@@ -51,7 +51,7 @@ function App() {
         }
       }
 
-      // Mailto fallback function
+      // Mailto fallback function with Gmail web option
       const createMailtoFallback = (data: any, statusP: HTMLParagraphElement | null) => {
         const subject = `Contact Request from ${data.name} - ${data.service || 'General Inquiry'}`
         const body = `Name: ${data.name}
@@ -65,15 +65,39 @@ ${data.message}
 ---
 Sent from TZKSolution contact form`
 
+        // Regular mailto link for default email client
         const mailtoLink = `mailto:tzkusman786@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
         
-        // Open email client
-        window.open(mailtoLink, '_blank')
+        // Gmail web compose link
+        const gmailWebLink = `https://mail.google.com/mail/?view=cm&fs=1&to=tzkusman786@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        
+        // WhatsApp link
+        const whatsappLink = `https://wa.me/923362793950?text=Hi, I'm ${encodeURIComponent(data.name)}. ${encodeURIComponent(data.message)}`
         
         if (statusP) {
-          statusP.innerHTML = `✅ Email client opened! If it didn't open automatically:<br>
-          📧 <a href="${mailtoLink}" target="_blank">Click here to send email</a><br>
-          💬 <a href="https://wa.me/923362793950?text=Hi, I'm ${data.name}. ${data.message}" target="_blank">Or message us on WhatsApp</a>`
+          statusP.innerHTML = `
+            <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+              <p style="margin-bottom: 1rem; font-weight: 600; color: #0369a1;">📧 Choose how to send your message:</p>
+              
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <a href="${gmailWebLink}" target="_blank" style="display: inline-block; background: #dc2626; color: white; padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 500; text-align: center;">
+                  📧 Open Gmail (Web)
+                </a>
+                
+                <a href="${mailtoLink}" style="display: inline-block; background: #2563eb; color: white; padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 500; text-align: center;">
+                  📬 Open Email Client (Outlook/Mail)
+                </a>
+                
+                <a href="${whatsappLink}" target="_blank" style="display: inline-block; background: #16a34a; color: white; padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 500; text-align: center;">
+                  💬 Send WhatsApp Message
+                </a>
+              </div>
+              
+              <p style="margin-top: 1rem; font-size: 0.85rem; color: #64748b;">
+                Your message details are pre-filled in the email. Just click send!
+              </p>
+            </div>
+          `
         }
       }
 
