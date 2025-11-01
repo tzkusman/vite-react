@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import './App.css'
 
 function App() {
@@ -6,10 +7,65 @@ function App() {
     element?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // Setup contact form handling after component mounts
+  useEffect(() => {
+    const form = document.getElementById('contact-form') as HTMLFormElement | null
+    if (form) {
+      const handleSubmit = async (e: Event) => {
+        e.preventDefault()
+        const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null
+        const statusP = document.getElementById('form-status') as HTMLParagraphElement | null
+        
+        if (submitBtn) submitBtn.disabled = true
+        if (statusP) statusP.textContent = 'Sending message...'
+
+        const formData = new FormData(form)
+        const data = {
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          company: formData.get('company') as string,
+          service: formData.get('service') as string,
+          message: formData.get('message') as string,
+        }
+
+        try {
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          })
+
+          if (res.ok) {
+            if (statusP) statusP.textContent = '✅ Message sent successfully! We\'ll get back to you soon.'
+            form.reset()
+          } else {
+            const errorData = await res.json()
+            if (statusP) statusP.textContent = `❌ Error: ${errorData?.error || 'Unable to send message'}`
+          }
+        } catch (err) {
+          if (statusP) statusP.textContent = '❌ Error sending message. Please try again later.'
+        } finally {
+          if (submitBtn) submitBtn.disabled = false
+        }
+      }
+
+      form.addEventListener('submit', handleSubmit)
+      return () => form.removeEventListener('submit', handleSubmit)
+    }
+  }, [])
+
   return (
     <div className="app">
       {/* Navigation */}
       <nav className="navbar">
+        <div className="nav-top">
+          <div className="container nav-top-inner">
+            <div className="contact-top">
+              <a href="mailto:tzkusman786@gmail.com">📧 tzkusman786@gmail.com</a>
+              <a href="https://wa.me/923362793950" target="_blank" rel="noreferrer">💬 +92 336 2793950</a>
+            </div>
+          </div>
+        </div>
         <div className="nav-container">
           <div className="nav-logo">
             <h2>TZKSolution</h2>
@@ -320,11 +376,11 @@ function App() {
               <div className="contact-details">
                 <div className="contact-item">
                   <strong>📧 Email:</strong>
-                  <p>info@tzksolution.com</p>
+                  <p>tzkusman786@gmail.com</p>
                 </div>
                 <div className="contact-item">
-                  <strong>📱 Phone:</strong>
-                  <p>+1 (555) 123-4567</p>
+                  <strong>� WhatsApp:</strong>
+                  <p><a href="https://wa.me/923362793950" target="_blank" rel="noreferrer">+92 336 2793950</a></p>
                 </div>
                 <div className="contact-item">
                   <strong>🌍 Location:</strong>
@@ -337,18 +393,18 @@ function App() {
               </div>
             </div>
             <div className="contact-form">
-              <form>
+              <form id="contact-form">
                 <div className="form-group">
-                  <input type="text" placeholder="Your Name" required />
+                  <input id="name" name="name" type="text" placeholder="Your Name" required />
                 </div>
                 <div className="form-group">
-                  <input type="email" placeholder="Your Email" required />
+                  <input id="email" name="email" type="email" placeholder="Your Email" required />
                 </div>
                 <div className="form-group">
-                  <input type="text" placeholder="Company Name" />
+                  <input id="company" name="company" type="text" placeholder="Company Name" />
                 </div>
                 <div className="form-group">
-                  <select required>
+                  <select id="service" name="service" required>
                     <option value="">Select Service</option>
                     <option value="digital-marketing">Digital Marketing</option>
                     <option value="web-development">Web Development</option>
@@ -359,9 +415,10 @@ function App() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <textarea placeholder="Project Details" rows={5} required></textarea>
+                  <textarea id="message" name="message" placeholder="Project Details" rows={5} required></textarea>
                 </div>
-                <button type="submit" className="btn-primary">Send Message</button>
+                <button id="submit-btn" type="submit" className="btn-primary">Send Message</button>
+                <p id="form-status" style={{ marginTop: '1rem' }}></p>
               </form>
             </div>
           </div>
