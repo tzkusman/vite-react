@@ -569,6 +569,24 @@ section {
   min-height: 120px;
 }
 
+#form-status {
+  font-size: 0.9rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 1rem !important;
+  line-height: 1.5;
+}
+
+#form-status a {
+  color: var(--primary-color);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+#form-status a:hover {
+  color: var(--secondary-color);
+}
+
 /* Footer */
 .footer {
   background: var(--bg-dark);

@@ -29,6 +29,7 @@ function App() {
         }
 
         try {
+          // Try server-side API first
           const res = await fetch('/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -39,13 +40,40 @@ function App() {
             if (statusP) statusP.textContent = '✅ Message sent successfully! We\'ll get back to you soon.'
             form.reset()
           } else {
-            const errorData = await res.json()
-            if (statusP) statusP.textContent = `❌ Error: ${errorData?.error || 'Unable to send message'}`
+            // Fallback to mailto link
+            createMailtoFallback(data, statusP)
           }
         } catch (err) {
-          if (statusP) statusP.textContent = '❌ Error sending message. Please try again later.'
+          // Fallback to mailto link
+          createMailtoFallback(data, statusP)
         } finally {
           if (submitBtn) submitBtn.disabled = false
+        }
+      }
+
+      // Mailto fallback function
+      const createMailtoFallback = (data: any, statusP: HTMLParagraphElement | null) => {
+        const subject = `Contact Request from ${data.name} - ${data.service || 'General Inquiry'}`
+        const body = `Name: ${data.name}
+Email: ${data.email}
+Company: ${data.company || 'Not specified'}
+Service: ${data.service || 'General Inquiry'}
+
+Message:
+${data.message}
+
+---
+Sent from TZKSolution contact form`
+
+        const mailtoLink = `mailto:tzkusman786@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        
+        // Open email client
+        window.open(mailtoLink, '_blank')
+        
+        if (statusP) {
+          statusP.innerHTML = `✅ Email client opened! If it didn't open automatically:<br>
+          📧 <a href="${mailtoLink}" target="_blank">Click here to send email</a><br>
+          💬 <a href="https://wa.me/923362793950?text=Hi, I'm ${data.name}. ${data.message}" target="_blank">Or message us on WhatsApp</a>`
         }
       }
 
